@@ -558,7 +558,7 @@ export default function Page() {
         <div
           style={{
             ...styles.heroCard,
-            width: isMobile ? "100%" : "100%",
+            width: "100%",
             maxWidth: isMobile ? "100%" : 880,
             minHeight: isMobile ? "100dvh" : "auto",
             borderRadius: isMobile ? 0 : 36,
@@ -614,7 +614,6 @@ export default function Page() {
               marginTop: isMobile ? 24 : 34,
               alignItems: "stretch",
               width: "100%",
-              maxWidth: isMobile ? "100%" : "none",
             }}
           >
             <input
@@ -652,7 +651,15 @@ export default function Page() {
 
   if (view === "incentives") {
     return renderPage(
-      <div style={{ ...styles.pageCard, padding: isMobile ? 16 : 30, width: "100%", boxSizing: "border-box", margin: isMobile ? "10px" : 0 }}>
+      <div
+        style={{
+          ...styles.pageCard,
+          padding: isMobile ? 16 : 30,
+          width: "100%",
+          boxSizing: "border-box",
+          margin: isMobile ? "10px" : 0,
+        }}
+      >
         <div style={styles.pageHeaderWithToolbar}>
           <div
             style={{
@@ -719,7 +726,15 @@ export default function Page() {
 
   if (view === "leaderboard") {
     return renderPage(
-      <div style={{ ...styles.pageCard, padding: isMobile ? 16 : 30, width: "100%", boxSizing: "border-box", margin: isMobile ? "10px" : 0 }}>
+      <div
+        style={{
+          ...styles.pageCard,
+          padding: isMobile ? 16 : 30,
+          width: "100%",
+          boxSizing: "border-box",
+          margin: isMobile ? "10px" : 0,
+        }}
+      >
         <div style={styles.pageHeader}>
           <img
             src="/logo.png"
@@ -732,7 +747,9 @@ export default function Page() {
           />
           <div>
             <div style={styles.pageKicker}>Platinum Pulse Network</div>
-            <h1 style={{ ...styles.pageTitle, fontSize: isMobile ? 30 : 42 }}>Public Leaderboard</h1>
+            <h1 style={{ ...styles.pageTitle, fontSize: isMobile ? 30 : 42 }}>
+              Public Leaderboard
+            </h1>
           </div>
         </div>
 
@@ -769,7 +786,9 @@ export default function Page() {
                 <div
                   style={{
                     ...styles.leaderboardStats,
-                    gridTemplateColumns: isMobile ? "repeat(2, minmax(90px, 1fr))" : "repeat(4, minmax(90px, 1fr))",
+                    gridTemplateColumns: isMobile
+                      ? "repeat(2, minmax(90px, 1fr))"
+                      : "repeat(4, minmax(90px, 1fr))",
                   }}
                 >
                   <div style={styles.lbStat}>
@@ -806,7 +825,15 @@ export default function Page() {
   const hoursRemainingText = formatMinutes(hoursRemaining)
 
   return renderPage(
-    <div style={{ ...styles.pageCard, padding: isMobile ? 16 : 30, width: "100%", boxSizing: "border-box", margin: isMobile ? "10px" : 0 }}>
+    <div
+      style={{
+        ...styles.pageCard,
+        padding: isMobile ? 16 : 30,
+        width: "100%",
+        boxSizing: "border-box",
+        margin: isMobile ? "10px" : 0,
+      }}
+    >
       <div style={styles.pageHeader}>
         <img
           src="/logo.png"
@@ -819,7 +846,9 @@ export default function Page() {
         />
         <div>
           <div style={styles.pageKicker}>Platinum Pulse Network</div>
-          <h1 style={{ ...styles.pageTitle, fontSize: isMobile ? 30 : 42 }}>Personal Dashboard</h1>
+          <h1 style={{ ...styles.pageTitle, fontSize: isMobile ? 30 : 42 }}>
+            Personal Dashboard
+          </h1>
         </div>
       </div>
 
@@ -832,7 +861,10 @@ export default function Page() {
         <StatCard title="Username" value={`@${creator.username}`} />
         <StatCard title="Diamonds" value={creator.diamonds} />
         <StatCard title="Valid LIVE Days" value={`${creator.validLiveDays} / ${INCENTIVE_DAYS_TARGET}`} />
-        <StatCard title="LIVE Duration" value={`${formatMinutes(creator.liveMinutes)} / ${INCENTIVE_HOURS_TARGET}h`} />
+        <StatCard
+          title="LIVE Duration"
+          value={`${formatMinutes(creator.liveMinutes)} / ${INCENTIVE_HOURS_TARGET}h`}
+        />
       </div>
 
       <div
@@ -870,7 +902,8 @@ export default function Page() {
               <strong>Eligible incentive days:</strong> {creator.eligibleIncentiveDays}d
             </div>
             <div>
-              <strong>Estimated bonus contribution:</strong> {formatCurrency(creator.estimatedBonusContribution)}
+              <strong>Estimated bonus contribution:</strong>{" "}
+              {formatCurrency(creator.estimatedBonusContribution)}
             </div>
             <div>
               <strong>Ratio:</strong> {creator.ratio}%
@@ -947,7 +980,7 @@ const styles = {
     width: "100%",
     boxSizing: "border-box",
     background:
-      "linear-gradient(rgba(3,7,18,0.52), rgba(2,6,23,0.84)), url('/background.png') center/cover no-repeat",
+      "linear-gradient(rgba(3,7,18,0.52), rgba(2,6,23,0.84)), url('/background.jpg') center/cover no-repeat",
     color: "white",
     fontFamily: "Arial, sans-serif",
     position: "relative",
