@@ -19,8 +19,6 @@ const defaultCreators = [
     liveMinutes: 0,
     eligibleIncentiveDays: 26,
     level: "Level 1",
-    estimatedBonusContribution: 0,
-    ratio: 0,
   },
   {
     id: 2,
@@ -32,8 +30,6 @@ const defaultCreators = [
     liveMinutes: 5 * 60 + 35,
     eligibleIncentiveDays: 31,
     level: "Level 1",
-    estimatedBonusContribution: 0,
-    ratio: 0,
   },
   {
     id: 3,
@@ -45,73 +41,6 @@ const defaultCreators = [
     liveMinutes: 0,
     eligibleIncentiveDays: 26,
     level: "Level 1",
-    estimatedBonusContribution: 0,
-    ratio: 0,
-  },
-  {
-    id: 4,
-    creatorId: "7614860370460737553",
-    username: "harleyquin057",
-    avatar: "/logo.png",
-    diamonds: 0,
-    validLiveDays: 0,
-    liveMinutes: 0,
-    eligibleIncentiveDays: 24,
-    level: "Level 1",
-    estimatedBonusContribution: 0,
-    ratio: 0,
-  },
-  {
-    id: 5,
-    creatorId: "7607595546672496657",
-    username: "d4navar",
-    avatar: "/logo.png",
-    diamonds: 0,
-    validLiveDays: 0,
-    liveMinutes: 0,
-    eligibleIncentiveDays: 31,
-    level: "Level 1",
-    estimatedBonusContribution: 0,
-    ratio: 0,
-  },
-  {
-    id: 6,
-    creatorId: "0000000000000000006",
-    username: "dolphinteddybear",
-    avatar: "/logo.png",
-    diamonds: 132,
-    validLiveDays: 0,
-    liveMinutes: 1 * 60 + 3,
-    eligibleIncentiveDays: 27,
-    level: "Level 1",
-    estimatedBonusContribution: 0,
-    ratio: 0,
-  },
-  {
-    id: 7,
-    creatorId: "7614194914745745424",
-    username: "keytok58",
-    avatar: "/logo.png",
-    diamonds: 117,
-    validLiveDays: 2,
-    liveMinutes: 9 * 60 + 15,
-    eligibleIncentiveDays: 26,
-    level: "Level 1",
-    estimatedBonusContribution: 0,
-    ratio: 0,
-  },
-  {
-    id: 8,
-    creatorId: "7613757241828589569",
-    username: "alishaesme",
-    avatar: "/logo.png",
-    diamonds: 125,
-    validLiveDays: 2,
-    liveMinutes: 4 * 60 + 24,
-    eligibleIncentiveDays: 27,
-    level: "Level 1",
-    estimatedBonusContribution: 0,
-    ratio: 0,
   },
 ]
 
@@ -125,8 +54,7 @@ function parseDurationToMinutes(value) {
   if (value === undefined || value === null || value === "") return 0
 
   if (typeof value === "number") {
-    if (value > 0 && value < 10) return Math.round(value * 24 * 60)
-    return Math.round(value)
+    return Math.round(value * 60)
   }
 
   const text = String(value).trim().toLowerCase()
@@ -134,14 +62,17 @@ function parseDurationToMinutes(value) {
   const hmMatch = text.match(/(\d+)\s*h\s*(\d+)\s*m/)
   if (hmMatch) return Number(hmMatch[1]) * 60 + Number(hmMatch[2])
 
-  const hOnlyMatch = text.match(/(\d+)\s*h/)
-  if (hOnlyMatch) return Number(hOnlyMatch[1]) * 60
+  const hOnlyMatch = text.match(/(\d+(?:\.\d+)?)\s*h/)
+  if (hOnlyMatch) return Math.round(Number(hOnlyMatch[1]) * 60)
 
   const mOnlyMatch = text.match(/(\d+)\s*m/)
   if (mOnlyMatch) return Number(mOnlyMatch[1])
 
   const colonMatch = text.match(/^(\d{1,2}):(\d{2})(?::\d{2})?$/)
   if (colonMatch) return Number(colonMatch[1]) * 60 + Number(colonMatch[2])
+
+  const plainNumber = Number(text)
+  if (!Number.isNaN(plainNumber)) return Math.round(plainNumber * 60)
 
   return 0
 }
@@ -151,10 +82,6 @@ function formatMinutes(minutes) {
   const hrs = Math.floor(safeMinutes / 60)
   const mins = safeMinutes % 60
   return `${hrs}h ${mins}m`
-}
-
-function formatCurrency(value) {
-  return `$${Number(value || 0).toFixed(2)}`
 }
 
 function isQualified(creator) {
@@ -200,7 +127,12 @@ function normalizeCreator(row, index) {
     row.creator ||
     ""
 
-  const diamonds = toNumber(row["Diamonds in L30D"] ?? row.Diamonds ?? row.diamonds ?? 0)
+  const diamonds = toNumber(
+    row["Diamonds in L30D"] ??
+      row["Diamonds"] ??
+      row.diamonds ??
+      0
+  )
 
   const validLiveDays = toNumber(
     row["Valid go LIVE days in L30D"] ??
@@ -222,16 +154,16 @@ function normalizeCreator(row, index) {
     row["Eligible incentive days"] ??
       row.eligibleIncentiveDays ??
       row["eligible days"] ??
+      row["Days since joining"] ??
       0
   )
 
-  const level = row.Level || row.level || "Level 1"
-
-  const estimatedBonusContribution = toNumber(
-    row["Estimated bonus contribution"] ?? row.estimatedBonusContribution ?? 0
-  )
-
-  const ratio = toNumber(row.Ratio ?? row.ratio ?? 0)
+  const level =
+    row.Level ||
+    row.level ||
+    row["Tier status"] ||
+    row["Tier last month"] ||
+    "Level 1"
 
   return {
     id: index + 1,
@@ -242,24 +174,21 @@ function normalizeCreator(row, index) {
     validLiveDays,
     liveMinutes,
     eligibleIncentiveDays,
-    level,
-    estimatedBonusContribution,
-    ratio,
+    level: String(level),
   }
 }
 
 function downloadTemplate() {
   const rows = [
     {
-      "Creator ID": "7614187880910471184",
-      "Creator username": "example.creator",
+      "Creator ID:": "7614187880910471184",
+      "Creator's username": "example.creator",
+      "Tier status": "Level 1",
+      "Tier last month": "Level 1",
+      "Days since joining": 30,
       "Diamonds in L30D": 245,
       "Valid go LIVE days in L30D": 9,
-      "LIVE duration in L30D": "21h 30m",
-      "Eligible incentive days": 30,
-      Level: "Level 1",
-      "Estimated bonus contribution": 75.5,
-      Ratio: 12,
+      "LIVE duration in L30D": 21.5,
     },
   ]
 
@@ -267,15 +196,6 @@ function downloadTemplate() {
   const book = XLSX.utils.book_new()
   XLSX.utils.book_append_sheet(book, sheet, "Creators")
   XLSX.writeFile(book, "creator-import-template.xlsx")
-}
-
-function GlassPanel({ title, text }) {
-  return (
-    <div style={styles.glassPanel}>
-      <h3 style={{ marginTop: 0, marginBottom: 10 }}>{title}</h3>
-      <div style={styles.lightText}>{text}</div>
-    </div>
-  )
 }
 
 function StatCard({ title, value }) {
@@ -323,7 +243,7 @@ function ImportToolbar({ onImportClick, onDownloadTemplate, onResetData, isMobil
     >
       <div>
         <div style={styles.topBarTitle}>Platinum Pulse Network</div>
-        <div style={styles.topBarSub}>Import creator data from Excel or CSV</div>
+        <div style={styles.topBarSub}>Import creator data from Backstage Excel or CSV</div>
       </div>
 
       <div
@@ -434,7 +354,19 @@ export default function Page() {
         const workbook = XLSX.read(data, { type: "array" })
         const firstSheetName = workbook.SheetNames[0]
         const firstSheet = workbook.Sheets[firstSheetName]
-        const rows = XLSX.utils.sheet_to_json(firstSheet, { defval: "" })
+
+        const previewRows = XLSX.utils.sheet_to_json(firstSheet, {
+          header: 1,
+          defval: "",
+        })
+
+        const headerRowIndex =
+          String(previewRows?.[0]?.[0] || "").toLowerCase().includes("exported at") ? 1 : 0
+
+        const rows = XLSX.utils.sheet_to_json(firstSheet, {
+          defval: "",
+          range: headerRowIndex,
+        })
 
         const parsed = rows
           .map((row, index) => normalizeCreator(row, index))
@@ -452,7 +384,7 @@ export default function Page() {
         setView("login")
         setImportSuccess(`${parsed.length} creators imported successfully.`)
       } catch {
-        setImportError("Could not read that file. Upload a valid XLSX, XLS, or CSV export.")
+        setImportError("Could not read that file. Upload a valid Backstage XLSX, XLS, or CSV export.")
       } finally {
         event.target.value = ""
       }
@@ -492,12 +424,7 @@ export default function Page() {
           style={{ display: "none" }}
         />
 
-        <div
-          style={{
-            ...styles.container,
-            padding: isMobile ? 0 : 0,
-          }}
-        >
+        <div style={styles.container}>
           {importError ? <div style={styles.errorBox}>{importError}</div> : null}
           {importSuccess ? <div style={styles.successBox}>{importSuccess}</div> : null}
 
@@ -698,27 +625,31 @@ export default function Page() {
             gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fit, minmax(260px, 1fr))",
           }}
         >
-          <GlassPanel title="Incentive Period" text={`${INCENTIVE_PERIOD_DAYS} day incentive cycle.`} />
-          <GlassPanel
-            title="Minimum LIVE Days"
-            text={`Creators must complete at least ${INCENTIVE_DAYS_TARGET} valid LIVE days.`}
-          />
-          <GlassPanel
-            title="Minimum LIVE Hours"
-            text={`Creators must complete at least ${INCENTIVE_HOURS_TARGET} LIVE hours.`}
-          />
-          <GlassPanel
-            title="Qualification"
-            text="A creator qualifies when both the LIVE day and LIVE hour requirements are completed."
-          />
-        </div>
+          <div style={styles.glassPanel}>
+            <h3 style={{ marginTop: 0, marginBottom: 10 }}>Incentive Period</h3>
+            <div style={styles.lightText}>{INCENTIVE_PERIOD_DAYS} day incentive cycle.</div>
+          </div>
 
-        <div style={styles.largeGlassPanel}>
-          <h2 style={{ marginTop: 0 }}>Tracked Metrics</h2>
-          <p style={styles.lightText}>
-            The portal tracks diamonds, LIVE duration, valid LIVE days, eligible incentive days,
-            creator level, and current qualification status.
-          </p>
+          <div style={styles.glassPanel}>
+            <h3 style={{ marginTop: 0, marginBottom: 10 }}>Minimum LIVE Days</h3>
+            <div style={styles.lightText}>
+              Creators must complete at least {INCENTIVE_DAYS_TARGET} valid LIVE days.
+            </div>
+          </div>
+
+          <div style={styles.glassPanel}>
+            <h3 style={{ marginTop: 0, marginBottom: 10 }}>Minimum LIVE Hours</h3>
+            <div style={styles.lightText}>
+              Creators must complete at least {INCENTIVE_HOURS_TARGET} LIVE hours.
+            </div>
+          </div>
+
+          <div style={styles.glassPanel}>
+            <h3 style={{ marginTop: 0, marginBottom: 10 }}>Qualification</h3>
+            <div style={styles.lightText}>
+              A creator qualifies when both the LIVE day and LIVE hour requirements are completed.
+            </div>
+          </div>
         </div>
       </div>
     )
@@ -779,7 +710,6 @@ export default function Page() {
                 <div style={styles.leaderboardIdentityNoAvatar}>
                   <div>
                     <div style={styles.leaderboardName}>@{creator.username}</div>
-                    <div style={styles.leaderboardMeta}>{creator.level}</div>
                   </div>
                 </div>
 
@@ -858,9 +788,11 @@ export default function Page() {
           gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fit, minmax(220px, 1fr))",
         }}
       >
-        <StatCard title="Username" value={`@${creator.username}`} />
         <StatCard title="Diamonds" value={creator.diamonds} />
-        <StatCard title="Valid LIVE Days" value={`${creator.validLiveDays} / ${INCENTIVE_DAYS_TARGET}`} />
+        <StatCard
+          title="Valid LIVE Days"
+          value={`${creator.validLiveDays} / ${INCENTIVE_DAYS_TARGET}`}
+        />
         <StatCard
           title="LIVE Duration"
           value={`${formatMinutes(creator.liveMinutes)} / ${INCENTIVE_HOURS_TARGET}h`}
@@ -890,25 +822,6 @@ export default function Page() {
           >
             {getStatusText(creator)}
           </div>
-
-          <div style={styles.infoList}>
-            <div>
-              <strong>Incentive period:</strong> {INCENTIVE_PERIOD_DAYS} days
-            </div>
-            <div>
-              <strong>Creator level:</strong> {creator.level}
-            </div>
-            <div>
-              <strong>Eligible incentive days:</strong> {creator.eligibleIncentiveDays}d
-            </div>
-            <div>
-              <strong>Estimated bonus contribution:</strong>{" "}
-              {formatCurrency(creator.estimatedBonusContribution)}
-            </div>
-            <div>
-              <strong>Ratio:</strong> {creator.ratio}%
-            </div>
-          </div>
         </Panel>
 
         <Panel>
@@ -933,7 +846,7 @@ export default function Page() {
       <div
         style={{
           ...styles.threeColGrid,
-          gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fit, minmax(320px, 1fr))",
+          gridTemplateColumns: isMobile ? "1fr" : "repeat(2, minmax(320px, 1fr))",
         }}
       >
         <Panel>
@@ -959,14 +872,6 @@ export default function Page() {
             {hoursRemaining === 0
               ? "LIVE duration requirement completed."
               : `${hoursRemainingText} more needed.`}
-          </div>
-        </Panel>
-
-        <Panel>
-          <h2 style={{ marginTop: 0 }}>Diamonds</h2>
-          <div style={styles.bigNumber}>{creator.diamonds}</div>
-          <div style={styles.progressText}>
-            Diamonds are tracked for ranking and creator performance.
           </div>
         </Panel>
       </div>
@@ -1243,17 +1148,6 @@ const styles = {
     padding: 22,
     boxShadow: "inset 0 1px 0 rgba(255,255,255,0.04)",
   },
-  largeGlassPanel: {
-    marginTop: 24,
-    borderRadius: 24,
-    background: "linear-gradient(180deg, rgba(11,26,64,0.82), rgba(8,18,46,0.76))",
-    border: "1px solid rgba(255,255,255,0.12)",
-    padding: 24,
-  },
-  lightText: {
-    color: "#dbeafe",
-    lineHeight: 1.7,
-  },
   statsGrid: {
     display: "grid",
     gap: 16,
@@ -1318,11 +1212,6 @@ const styles = {
     marginTop: 10,
     color: "#bfdbfe",
   },
-  bigNumber: {
-    fontSize: 40,
-    fontWeight: "bold",
-    marginBottom: 10,
-  },
   leaderboardSearchWrap: {
     marginBottom: 18,
   },
@@ -1372,11 +1261,6 @@ const styles = {
   leaderboardName: {
     fontWeight: "bold",
     fontSize: 18,
-  },
-  leaderboardMeta: {
-    color: "#bfdbfe",
-    fontSize: 14,
-    marginTop: 4,
   },
   leaderboardStats: {
     display: "grid",
