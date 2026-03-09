@@ -200,20 +200,6 @@ function normalizeCreator(row, index) {
     row.creator ||
     ""
 
-  const avatar =
-    row["Profile Picture"] ||
-    row["Profile picture"] ||
-    row["Profile Pic"] ||
-    row["Profile pic"] ||
-    row["Avatar"] ||
-    row["avatar"] ||
-    row["Avatar URL"] ||
-    row["Avatar Url"] ||
-    row["Profile Image"] ||
-    row.profilePicture ||
-    row.avatar ||
-    "/logo.png"
-
   const diamonds = toNumber(row["Diamonds in L30D"] ?? row.Diamonds ?? row.diamonds ?? 0)
 
   const validLiveDays = toNumber(
@@ -251,7 +237,7 @@ function normalizeCreator(row, index) {
     id: index + 1,
     creatorId: String(creatorId),
     username: String(username).trim(),
-    avatar: String(avatar).trim() || "/logo.png",
+    avatar: "/logo.png",
     diamonds,
     validLiveDays,
     liveMinutes,
@@ -267,7 +253,6 @@ function downloadTemplate() {
     {
       "Creator ID": "7614187880910471184",
       "Creator username": "example.creator",
-      "Profile Picture": "https://example.com/avatar.jpg",
       "Diamonds in L30D": 245,
       "Valid go LIVE days in L30D": 9,
       "LIVE duration in L30D": "21h 30m",
@@ -314,15 +299,40 @@ function ProgressBar({ value }) {
   )
 }
 
-function ImportToolbar({ onImportClick, onDownloadTemplate, onResetData }) {
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const update = () => setIsMobile(window.innerWidth < 768)
+    update()
+    window.addEventListener("resize", update)
+    return () => window.removeEventListener("resize", update)
+  }, [])
+
+  return isMobile
+}
+
+function ImportToolbar({ onImportClick, onDownloadTemplate, onResetData, isMobile }) {
   return (
-    <div style={styles.importToolbarWrap}>
+    <div
+      style={{
+        ...styles.importToolbarWrap,
+        flexDirection: isMobile ? "column" : "row",
+        alignItems: isMobile ? "stretch" : "center",
+      }}
+    >
       <div>
         <div style={styles.topBarTitle}>Platinum Pulse Network</div>
         <div style={styles.topBarSub}>Import creator data from Excel or CSV</div>
       </div>
 
-      <div style={styles.importToolbar}>
+      <div
+        style={{
+          ...styles.importToolbar,
+          width: isMobile ? "100%" : "auto",
+          flexDirection: isMobile ? "column" : "row",
+        }}
+      >
         <button onClick={onImportClick} style={styles.importButton}>
           Import Creators
         </button>
@@ -338,6 +348,7 @@ function ImportToolbar({ onImportClick, onDownloadTemplate, onResetData }) {
 }
 
 export default function Page() {
+  const isMobile = useIsMobile()
   const [creators, setCreators] = useState(defaultCreators)
   const [username, setUsername] = useState("")
   const [selectedCreator, setSelectedCreator] = useState(null)
@@ -345,6 +356,7 @@ export default function Page() {
   const [importError, setImportError] = useState("")
   const [importSuccess, setImportSuccess] = useState("")
   const [view, setView] = useState("login")
+  const [leaderboardSearch, setLeaderboardSearch] = useState("")
   const fileInputRef = useRef(null)
 
   useEffect(() => {
@@ -373,6 +385,10 @@ export default function Page() {
         rank: index + 1,
       }))
   }, [creators])
+
+  const filteredLeaderboard = leaderboard.filter((creator) =>
+    creator.username.toLowerCase().includes(leaderboardSearch.trim().toLowerCase())
+  )
 
   function handleLookup() {
     const found = creators.find(
@@ -454,6 +470,7 @@ export default function Page() {
     setImportError("")
     setImportSuccess("Demo data restored.")
     setView("login")
+    setLeaderboardSearch("")
   }
 
   function renderPage(content) {
@@ -471,13 +488,17 @@ export default function Page() {
         />
 
         <div style={styles.container}>
-          
-
           {importError ? <div style={styles.errorBox}>{importError}</div> : null}
           {importSuccess ? <div style={styles.successBox}>{importSuccess}</div> : null}
 
           {view !== "login" ? (
-            <div style={styles.navBar}>
+            <div
+              style={{
+                ...styles.navBar,
+                flexDirection: isMobile ? "column" : "row",
+                alignItems: isMobile ? "stretch" : "center",
+              }}
+            >
               <div style={styles.navBrand}>
                 <img src="/logo.png" alt="Platinum Pulse Network" style={styles.navLogo} />
                 <div>
@@ -486,7 +507,12 @@ export default function Page() {
                 </div>
               </div>
 
-              <div style={styles.navButtons}>
+              <div
+                style={{
+                  ...styles.navButtons,
+                  width: isMobile ? "100%" : "auto",
+                }}
+              >
                 <button onClick={() => setView("dashboard")} style={styles.navButton}>
                   Dashboard
                 </button>
@@ -511,18 +537,55 @@ export default function Page() {
 
   if (view === "login") {
     return renderPage(
-      <div style={styles.heroCard}>
+      <div
+        style={{
+          ...styles.heroCard,
+          margin: isMobile ? "24px auto 0" : "90px auto 0",
+          borderRadius: isMobile ? 24 : 36,
+          padding: isMobile ? "28px 18px" : "54px 42px",
+        }}
+      >
         <div style={styles.heroTop}>
-          <img src="/logo.png" alt="Platinum Pulse Network" style={styles.heroLogo} />
+          <img
+            src="/logo.png"
+            alt="Platinum Pulse Network"
+            style={{
+              ...styles.heroLogo,
+              height: isMobile ? 120 : 170,
+              width: isMobile ? 120 : 170,
+            }}
+          />
           <div style={styles.heroBadge}>Creator Portal</div>
         </div>
 
-        <h1 style={styles.heroTitle}>Platinum Pulse Network</h1>
-        <p style={styles.heroText}>
+        <h1
+          style={{
+            ...styles.heroTitle,
+            fontSize: isMobile ? 42 : 62,
+            letterSpacing: isMobile ? "-1px" : "-2px",
+            lineHeight: isMobile ? 1.05 : 1.02,
+          }}
+        >
+          Platinum Pulse Network
+        </h1>
+
+        <p
+          style={{
+            ...styles.heroText,
+            fontSize: isMobile ? 16 : 22,
+          }}
+        >
           Enter your username to access your personal dashboard, or import a fresh creator export above.
         </p>
 
-        <div style={styles.loginRow}>
+        <div
+          style={{
+            ...styles.loginRow,
+            flexDirection: isMobile ? "column" : "row",
+            marginTop: isMobile ? 24 : 34,
+            alignItems: "stretch",
+          }}
+        >
           <input
             value={username}
             onChange={(e) => setUsername(e.target.value)}
@@ -530,9 +593,22 @@ export default function Page() {
               if (e.key === "Enter") handleLookup()
             }}
             placeholder="Enter your username"
-            style={styles.loginInput}
+            style={{
+              ...styles.loginInput,
+              maxWidth: isMobile ? "100%" : 500,
+              fontSize: isMobile ? 16 : 18,
+              padding: isMobile ? "16px 18px" : "18px 20px",
+            }}
           />
-          <button onClick={handleLookup} style={styles.primaryButton}>
+          <button
+            onClick={handleLookup}
+            style={{
+              ...styles.primaryButton,
+              width: isMobile ? "100%" : "auto",
+              fontSize: isMobile ? 16 : 18,
+              padding: isMobile ? "16px 20px" : "18px 28px",
+            }}
+          >
             Enter Dashboard
           </button>
         </div>
@@ -544,13 +620,28 @@ export default function Page() {
 
   if (view === "incentives") {
     return renderPage(
-      <div style={styles.pageCard}>
+      <div style={{ ...styles.pageCard, padding: isMobile ? 18 : 30 }}>
         <div style={styles.pageHeaderWithToolbar}>
-          <div style={styles.pageHeader}>
-            <img src="/logo.png" alt="Platinum Pulse Network" style={styles.pageLogo} />
+          <div
+            style={{
+              ...styles.pageHeader,
+              marginBottom: isMobile ? 12 : 24,
+            }}
+          >
+            <img
+              src="/logo.png"
+              alt="Platinum Pulse Network"
+              style={{
+                ...styles.pageLogo,
+                width: isMobile ? 82 : 120,
+                height: isMobile ? 82 : 120,
+              }}
+            />
             <div>
               <div style={styles.pageKicker}>Platinum Pulse Network</div>
-              <h1 style={styles.pageTitle}>How Incentives Work</h1>
+              <h1 style={{ ...styles.pageTitle, fontSize: isMobile ? 30 : 42 }}>
+                How Incentives Work
+              </h1>
             </div>
           </div>
 
@@ -558,10 +649,16 @@ export default function Page() {
             onImportClick={openImporter}
             onDownloadTemplate={downloadTemplate}
             onResetData={resetToDemoData}
+            isMobile={isMobile}
           />
         </div>
 
-        <div style={styles.cardGrid}>
+        <div
+          style={{
+            ...styles.cardGrid,
+            gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fit, minmax(260px, 1fr))",
+          }}
+        >
           <GlassPanel title="Incentive Period" text={`${INCENTIVE_PERIOD_DAYS} day incentive cycle.`} />
           <GlassPanel
             title="Minimum LIVE Days"
@@ -589,18 +686,21 @@ export default function Page() {
   }
 
   if (view === "leaderboard") {
-    const [leaderboardSearch, setLeaderboardSearch] = [username, setUsername]
-    const filteredLeaderboard = leaderboard.filter((creator) =>
-      creator.username.toLowerCase().includes(leaderboardSearch.trim().toLowerCase())
-    )
-
     return renderPage(
-      <div style={styles.pageCard}>
+      <div style={{ ...styles.pageCard, padding: isMobile ? 18 : 30 }}>
         <div style={styles.pageHeader}>
-          <img src="/logo.png" alt="Platinum Pulse Network" style={styles.pageLogo} />
+          <img
+            src="/logo.png"
+            alt="Platinum Pulse Network"
+            style={{
+              ...styles.pageLogo,
+              width: isMobile ? 82 : 120,
+              height: isMobile ? 82 : 120,
+            }}
+          />
           <div>
             <div style={styles.pageKicker}>Platinum Pulse Network</div>
-            <h1 style={styles.pageTitle}>Public Leaderboard</h1>
+            <h1 style={{ ...styles.pageTitle, fontSize: isMobile ? 30 : 42 }}>Public Leaderboard</h1>
           </div>
         </div>
 
@@ -616,7 +716,15 @@ export default function Page() {
         <div style={styles.leaderboardWrap}>
           {filteredLeaderboard.length ? (
             filteredLeaderboard.map((creator) => (
-              <div key={creator.id} style={styles.leaderboardRow}>
+              <div
+                key={creator.id}
+                style={{
+                  ...styles.leaderboardRow,
+                  gridTemplateColumns: isMobile
+                    ? "1fr"
+                    : "90px minmax(220px, 1fr) minmax(380px, 2fr)",
+                }}
+              >
                 <div style={styles.rankCircle}>#{creator.rank}</div>
 
                 <div style={styles.leaderboardIdentityNoAvatar}>
@@ -626,7 +734,12 @@ export default function Page() {
                   </div>
                 </div>
 
-                <div style={styles.leaderboardStats}>
+                <div
+                  style={{
+                    ...styles.leaderboardStats,
+                    gridTemplateColumns: isMobile ? "repeat(2, minmax(90px, 1fr))" : "repeat(4, minmax(90px, 1fr))",
+                  }}
+                >
                   <div style={styles.lbStat}>
                     <span style={styles.lbLabel}>Diamonds</span>
                     <strong>{creator.diamonds}</strong>
@@ -661,26 +774,41 @@ export default function Page() {
   const hoursRemainingText = formatMinutes(hoursRemaining)
 
   return renderPage(
-    <div style={styles.pageCard}>
+    <div style={{ ...styles.pageCard, padding: isMobile ? 18 : 30 }}>
       <div style={styles.pageHeader}>
-        <img src="/logo.png" alt="Platinum Pulse Network" style={styles.pageLogo} />
+        <img
+          src="/logo.png"
+          alt="Platinum Pulse Network"
+          style={{
+            ...styles.pageLogo,
+            width: isMobile ? 82 : 120,
+            height: isMobile ? 82 : 120,
+          }}
+        />
         <div>
           <div style={styles.pageKicker}>Platinum Pulse Network</div>
-          <h1 style={styles.pageTitle}>Personal Dashboard</h1>
+          <h1 style={{ ...styles.pageTitle, fontSize: isMobile ? 30 : 42 }}>Personal Dashboard</h1>
         </div>
       </div>
 
-      <div style={styles.statsGrid}>
+      <div
+        style={{
+          ...styles.statsGrid,
+          gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fit, minmax(220px, 1fr))",
+        }}
+      >
         <StatCard title="Username" value={`@${creator.username}`} />
         <StatCard title="Diamonds" value={creator.diamonds} />
         <StatCard title="Valid LIVE Days" value={`${creator.validLiveDays} / ${INCENTIVE_DAYS_TARGET}`} />
-        <StatCard
-          title="LIVE Duration"
-          value={`${formatMinutes(creator.liveMinutes)} / ${INCENTIVE_HOURS_TARGET}h`}
-        />
+        <StatCard title="LIVE Duration" value={`${formatMinutes(creator.liveMinutes)} / ${INCENTIVE_HOURS_TARGET}h`} />
       </div>
 
-      <div style={styles.twoColGrid}>
+      <div
+        style={{
+          ...styles.twoColGrid,
+          gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fit, minmax(320px, 1fr))",
+        }}
+      >
         <Panel>
           <h2 style={{ marginTop: 0 }}>Incentive Status</h2>
           <div
@@ -737,7 +865,12 @@ export default function Page() {
         </Panel>
       </div>
 
-      <div style={styles.threeColGrid}>
+      <div
+        style={{
+          ...styles.threeColGrid,
+          gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fit, minmax(320px, 1fr))",
+        }}
+      >
         <Panel>
           <h2 style={{ marginTop: 0 }}>LIVE Days Progress</h2>
           <div style={styles.mutedText}>
@@ -869,7 +1002,6 @@ const styles = {
   heroCard: {
     width: "100%",
     maxWidth: 880,
-    margin: "90px auto 0",
     borderRadius: 36,
     padding: "54px 42px",
     background: "linear-gradient(180deg, rgba(10,25,61,0.72), rgba(7,18,42,0.68))",
@@ -887,8 +1019,6 @@ const styles = {
     marginBottom: 18,
   },
   heroLogo: {
-    height: 170,
-    width: 170,
     objectFit: "contain",
     marginBottom: 14,
     filter: "drop-shadow(0 0 20px rgba(103,232,249,0.35))",
@@ -904,20 +1034,15 @@ const styles = {
   },
   heroTitle: {
     margin: 0,
-    fontSize: 62,
-    lineHeight: 1.02,
-    letterSpacing: "-2px",
     textShadow: "0 10px 40px rgba(0,0,0,0.24)",
   },
   heroText: {
     margin: "18px auto 0",
     color: "#dbeafe",
-    fontSize: 22,
     maxWidth: 700,
     lineHeight: 1.5,
   },
   loginRow: {
-    marginTop: 34,
     display: "flex",
     gap: 14,
     justifyContent: "center",
@@ -925,25 +1050,20 @@ const styles = {
   },
   loginInput: {
     width: "100%",
-    maxWidth: 500,
-    padding: "18px 20px",
     borderRadius: 18,
     border: "1px solid rgba(255,255,255,0.16)",
     background: "rgba(255,255,255,0.08)",
     color: "white",
-    fontSize: 18,
     outline: "none",
     boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.04)",
   },
   primaryButton: {
-    padding: "18px 28px",
     borderRadius: 18,
     border: "none",
     background: "linear-gradient(135deg, #67e8f9 0%, #22d3ee 100%)",
     color: "#062033",
     cursor: "pointer",
     fontWeight: "bold",
-    fontSize: 18,
     boxShadow: "0 10px 30px rgba(34,211,238,0.24)",
   },
   errorBox: {
@@ -1001,10 +1121,10 @@ const styles = {
     color: "white",
     cursor: "pointer",
     fontWeight: "bold",
+    flex: "1 1 140px",
   },
   pageCard: {
     borderRadius: 32,
-    padding: 30,
     background: "linear-gradient(180deg, rgba(10,25,61,0.72), rgba(7,18,42,0.68))",
     border: "1px solid rgba(255,255,255,0.12)",
     backdropFilter: "blur(16px)",
@@ -1024,8 +1144,6 @@ const styles = {
     flexWrap: "wrap",
   },
   pageLogo: {
-    width: 120,
-    height: 120,
     objectFit: "contain",
     filter: "drop-shadow(0 0 16px rgba(103,232,249,0.25))",
   },
@@ -1036,11 +1154,9 @@ const styles = {
   },
   pageTitle: {
     margin: 0,
-    fontSize: 42,
   },
   cardGrid: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
     gap: 18,
   },
   glassPanel: {
@@ -1063,7 +1179,6 @@ const styles = {
   },
   statsGrid: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
     gap: 16,
     marginBottom: 24,
   },
@@ -1085,13 +1200,11 @@ const styles = {
   },
   twoColGrid: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
     gap: 16,
     marginBottom: 24,
   },
   threeColGrid: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
     gap: 16,
     marginBottom: 24,
   },
@@ -1153,7 +1266,6 @@ const styles = {
   },
   leaderboardRow: {
     display: "grid",
-    gridTemplateColumns: "90px minmax(220px, 1fr) minmax(380px, 2fr)",
     gap: 16,
     alignItems: "center",
     background: "linear-gradient(180deg, rgba(11,26,64,0.82), rgba(8,18,46,0.76))",
@@ -1174,11 +1286,6 @@ const styles = {
     color: "white",
     boxShadow: "0 10px 30px rgba(37,99,235,0.25)",
   },
-  leaderboardIdentity: {
-    display: "flex",
-    alignItems: "center",
-    gap: 14,
-  },
   leaderboardIdentityNoAvatar: {
     display: "flex",
     alignItems: "center",
@@ -1195,7 +1302,6 @@ const styles = {
   },
   leaderboardStats: {
     display: "grid",
-    gridTemplateColumns: "repeat(4, minmax(90px, 1fr))",
     gap: 12,
   },
   lbStat: {
