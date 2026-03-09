@@ -475,7 +475,12 @@ export default function Page() {
 
   function renderPage(content) {
     return (
-      <main style={styles.page}>
+      <main
+        style={{
+          ...styles.page,
+          padding: isMobile ? 10 : 24,
+        }}
+      >
         <div style={styles.backgroundGlowOne} />
         <div style={styles.backgroundGlowTwo} />
 
@@ -540,6 +545,8 @@ export default function Page() {
       <div
         style={{
           ...styles.heroCard,
+          width: "100%",
+          boxSizing: "border-box",
           margin: isMobile ? "24px auto 0" : "90px auto 0",
           borderRadius: isMobile ? 24 : 36,
           padding: isMobile ? "28px 18px" : "54px 42px",
@@ -620,7 +627,7 @@ export default function Page() {
 
   if (view === "incentives") {
     return renderPage(
-      <div style={{ ...styles.pageCard, padding: isMobile ? 18 : 30 }}>
+      <div style={{ ...styles.pageCard, padding: isMobile ? 16 : 30, width: "100%", boxSizing: "border-box" }}>
         <div style={styles.pageHeaderWithToolbar}>
           <div
             style={{
@@ -912,6 +919,8 @@ export default function Page() {
 const styles = {
   page: {
     minHeight: "100vh",
+    width: "100%",
+    boxSizing: "border-box",
     background:
       "linear-gradient(rgba(3,7,18,0.52), rgba(2,6,23,0.84)), url('/background.png') center/cover no-repeat",
     color: "white",
@@ -941,10 +950,12 @@ const styles = {
     pointerEvents: "none",
   },
   container: {
+    width: "100%",
     maxWidth: 1280,
     margin: "0 auto",
     position: "relative",
     zIndex: 2,
+    boxSizing: "border-box",
   },
   importToolbarWrap: {
     display: "flex",
@@ -1002,6 +1013,7 @@ const styles = {
   heroCard: {
     width: "100%",
     maxWidth: 880,
+    boxSizing: "border-box",
     borderRadius: 36,
     padding: "54px 42px",
     background: "linear-gradient(180deg, rgba(10,25,61,0.72), rgba(7,18,42,0.68))",
@@ -1124,6 +1136,8 @@ const styles = {
     flex: "1 1 140px",
   },
   pageCard: {
+    width: "100%",
+    boxSizing: "border-box",
     borderRadius: 32,
     background: "linear-gradient(180deg, rgba(10,25,61,0.72), rgba(7,18,42,0.68))",
     border: "1px solid rgba(255,255,255,0.12)",
@@ -1324,3 +1338,4 @@ const styles = {
     textAlign: "center",
   },
 }
+
