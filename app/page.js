@@ -478,7 +478,7 @@ export default function Page() {
       <main
         style={{
           ...styles.page,
-          padding: isMobile ? 10 : 24,
+          padding: isMobile ? 0 : 24,
         }}
       >
         <div style={styles.backgroundGlowOne} />
@@ -492,7 +492,12 @@ export default function Page() {
           style={{ display: "none" }}
         />
 
-        <div style={styles.container}>
+        <div
+          style={{
+            ...styles.container,
+            padding: isMobile ? 0 : 0,
+          }}
+        >
           {importError ? <div style={styles.errorBox}>{importError}</div> : null}
           {importSuccess ? <div style={styles.successBox}>{importSuccess}</div> : null}
 
@@ -502,6 +507,7 @@ export default function Page() {
                 ...styles.navBar,
                 flexDirection: isMobile ? "column" : "row",
                 alignItems: isMobile ? "stretch" : "center",
+                margin: isMobile ? "10px 10px 14px" : "0 0 22px",
               }}
             >
               <div style={styles.navBrand}>
@@ -544,90 +550,109 @@ export default function Page() {
     return renderPage(
       <div
         style={{
-          ...styles.heroCard,
-          width: "100%",
-          boxSizing: "border-box",
-          margin: isMobile ? "24px auto 0" : "90px auto 0",
-          borderRadius: isMobile ? 24 : 36,
-          padding: isMobile ? "28px 18px" : "54px 42px",
+          ...styles.splashWrap,
+          minHeight: isMobile ? "100dvh" : "calc(100dvh - 48px)",
+          padding: isMobile ? 0 : 24,
         }}
       >
-        <div style={styles.heroTop}>
-          <img
-            src="/logo.png"
-            alt="Platinum Pulse Network"
-            style={{
-              ...styles.heroLogo,
-              height: isMobile ? 120 : 170,
-              width: isMobile ? 120 : 170,
-            }}
-          />
-          <div style={styles.heroBadge}>Creator Portal</div>
-        </div>
-
-        <h1
-          style={{
-            ...styles.heroTitle,
-            fontSize: isMobile ? 42 : 62,
-            letterSpacing: isMobile ? "-1px" : "-2px",
-            lineHeight: isMobile ? 1.05 : 1.02,
-          }}
-        >
-          Platinum Pulse Network
-        </h1>
-
-        <p
-          style={{
-            ...styles.heroText,
-            fontSize: isMobile ? 16 : 22,
-          }}
-        >
-          Enter your username to access your personal dashboard, or import a fresh creator export above.
-        </p>
-
         <div
           style={{
-            ...styles.loginRow,
-            flexDirection: isMobile ? "column" : "row",
-            marginTop: isMobile ? 24 : 34,
-            alignItems: "stretch",
+            ...styles.heroCard,
+            width: isMobile ? "100%" : "100%",
+            maxWidth: isMobile ? "100%" : 880,
+            minHeight: isMobile ? "100dvh" : "auto",
+            borderRadius: isMobile ? 0 : 36,
+            padding: isMobile ? "32px 20px 36px" : "54px 42px",
+            boxShadow: isMobile ? "none" : "0 30px 100px rgba(0,0,0,0.35)",
+            border: isMobile ? "none" : "1px solid rgba(255,255,255,0.14)",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
           }}
         >
-          <input
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") handleLookup()
-            }}
-            placeholder="Enter your username"
+          <div style={styles.heroTop}>
+            <img
+              src="/logo.png"
+              alt="Platinum Pulse Network"
+              style={{
+                ...styles.heroLogo,
+                height: isMobile ? 136 : 170,
+                width: isMobile ? 136 : 170,
+              }}
+            />
+            <div style={styles.heroBadge}>Creator Portal</div>
+          </div>
+
+          <h1
             style={{
-              ...styles.loginInput,
-              maxWidth: isMobile ? "100%" : 500,
-              fontSize: isMobile ? 16 : 18,
-              padding: isMobile ? "16px 18px" : "18px 20px",
-            }}
-          />
-          <button
-            onClick={handleLookup}
-            style={{
-              ...styles.primaryButton,
-              width: isMobile ? "100%" : "auto",
-              fontSize: isMobile ? 16 : 18,
-              padding: isMobile ? "16px 20px" : "18px 28px",
+              ...styles.heroTitle,
+              fontSize: isMobile ? 34 : 62,
+              letterSpacing: isMobile ? "-1px" : "-2px",
+              lineHeight: isMobile ? 1.06 : 1.02,
+              maxWidth: isMobile ? 320 : "none",
+              marginLeft: "auto",
+              marginRight: "auto",
             }}
           >
-            Enter Dashboard
-          </button>
-        </div>
+            Platinum Pulse Network
+          </h1>
 
-        {error ? <div style={styles.errorBox}>{error}</div> : null}
+          <p
+            style={{
+              ...styles.heroText,
+              fontSize: isMobile ? 16 : 22,
+              maxWidth: isMobile ? 320 : 700,
+            }}
+          >
+            Enter your username to access your personal dashboard, or import a fresh creator export above.
+          </p>
+
+          <div
+            style={{
+              ...styles.loginRow,
+              flexDirection: isMobile ? "column" : "row",
+              marginTop: isMobile ? 24 : 34,
+              alignItems: "stretch",
+              width: "100%",
+              maxWidth: isMobile ? "100%" : "none",
+            }}
+          >
+            <input
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleLookup()
+              }}
+              placeholder="Enter your username"
+              style={{
+                ...styles.loginInput,
+                maxWidth: isMobile ? "100%" : 500,
+                fontSize: isMobile ? 16 : 18,
+                padding: isMobile ? "18px 18px" : "18px 20px",
+              }}
+            />
+            <button
+              onClick={handleLookup}
+              style={{
+                ...styles.primaryButton,
+                width: isMobile ? "100%" : "auto",
+                fontSize: isMobile ? 16 : 18,
+                padding: isMobile ? "18px 20px" : "18px 28px",
+              }}
+            >
+              Enter Dashboard
+            </button>
+          </div>
+
+          {error ? <div style={styles.errorBox}>{error}</div> : null}
+        </div>
       </div>
     )
   }
 
   if (view === "incentives") {
     return renderPage(
-      <div style={{ ...styles.pageCard, padding: isMobile ? 16 : 30, width: "100%", boxSizing: "border-box" }}>
+      <div style={{ ...styles.pageCard, padding: isMobile ? 16 : 30, width: "100%", boxSizing: "border-box", margin: isMobile ? "10px" : 0 }}>
         <div style={styles.pageHeaderWithToolbar}>
           <div
             style={{
@@ -694,7 +719,7 @@ export default function Page() {
 
   if (view === "leaderboard") {
     return renderPage(
-      <div style={{ ...styles.pageCard, padding: isMobile ? 18 : 30 }}>
+      <div style={{ ...styles.pageCard, padding: isMobile ? 16 : 30, width: "100%", boxSizing: "border-box", margin: isMobile ? "10px" : 0 }}>
         <div style={styles.pageHeader}>
           <img
             src="/logo.png"
@@ -781,7 +806,7 @@ export default function Page() {
   const hoursRemainingText = formatMinutes(hoursRemaining)
 
   return renderPage(
-    <div style={{ ...styles.pageCard, padding: isMobile ? 18 : 30 }}>
+    <div style={{ ...styles.pageCard, padding: isMobile ? 16 : 30, width: "100%", boxSizing: "border-box", margin: isMobile ? "10px" : 0 }}>
       <div style={styles.pageHeader}>
         <img
           src="/logo.png"
@@ -918,16 +943,16 @@ export default function Page() {
 
 const styles = {
   page: {
-    minHeight: "100vh",
+    minHeight: "100dvh",
     width: "100%",
     boxSizing: "border-box",
     background:
       "linear-gradient(rgba(3,7,18,0.52), rgba(2,6,23,0.84)), url('/background.png') center/cover no-repeat",
     color: "white",
     fontFamily: "Arial, sans-serif",
-    padding: 24,
     position: "relative",
-    overflow: "hidden",
+    overflowX: "hidden",
+    overflowY: "auto",
   },
   backgroundGlowOne: {
     position: "absolute",
@@ -955,6 +980,13 @@ const styles = {
     margin: "0 auto",
     position: "relative",
     zIndex: 2,
+    boxSizing: "border-box",
+  },
+  splashWrap: {
+    width: "100%",
+    display: "flex",
+    alignItems: "stretch",
+    justifyContent: "center",
     boxSizing: "border-box",
   },
   importToolbarWrap: {
@@ -1009,16 +1041,14 @@ const styles = {
     background: "rgba(34,197,94,0.14)",
     border: "1px solid rgba(34,197,94,0.25)",
     color: "#bbf7d0",
+    marginLeft: 10,
+    marginRight: 10,
   },
   heroCard: {
     width: "100%",
     maxWidth: 880,
     boxSizing: "border-box",
-    borderRadius: 36,
-    padding: "54px 42px",
     background: "linear-gradient(180deg, rgba(10,25,61,0.72), rgba(7,18,42,0.68))",
-    border: "1px solid rgba(255,255,255,0.14)",
-    boxShadow: "0 30px 100px rgba(0,0,0,0.35)",
     textAlign: "center",
     backdropFilter: "blur(18px)",
     WebkitBackdropFilter: "blur(18px)",
@@ -1051,7 +1081,6 @@ const styles = {
   heroText: {
     margin: "18px auto 0",
     color: "#dbeafe",
-    maxWidth: 700,
     lineHeight: 1.5,
   },
   loginRow: {
@@ -1068,6 +1097,7 @@ const styles = {
     color: "white",
     outline: "none",
     boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.04)",
+    boxSizing: "border-box",
   },
   primaryButton: {
     borderRadius: 18,
@@ -1077,6 +1107,7 @@ const styles = {
     cursor: "pointer",
     fontWeight: "bold",
     boxShadow: "0 10px 30px rgba(34,211,238,0.24)",
+    boxSizing: "border-box",
   },
   errorBox: {
     marginTop: 20,
@@ -1095,7 +1126,6 @@ const styles = {
     gap: 18,
     alignItems: "center",
     flexWrap: "wrap",
-    marginBottom: 22,
     padding: "18px 20px",
     borderRadius: 24,
     background: "linear-gradient(180deg, rgba(11,26,64,0.72), rgba(8,18,46,0.66))",
@@ -1273,6 +1303,7 @@ const styles = {
     color: "white",
     fontSize: 16,
     outline: "none",
+    boxSizing: "border-box",
   },
   leaderboardWrap: {
     display: "grid",
@@ -1338,4 +1369,3 @@ const styles = {
     textAlign: "center",
   },
 }
-
